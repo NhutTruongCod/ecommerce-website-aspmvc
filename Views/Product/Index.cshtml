@@ -1,0 +1,100 @@
+@model IEnumerable<Product>
+
+@{
+    ViewData["Title"] = "Sản phẩm";
+}
+
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb" class="bg-white py-2 px-3 mb-3 rounded shadow-sm">
+
+</nav>
+
+<!-- Banner -->
+<div class="mb-4">
+    <img src="https://static.vecteezy.com/system/resources/previews/041/417/220/non_2x/fashion-sale-horizontal-banner-with-discount-offer-advertisement-with-colorful-sketches-of-various-clothing-items-illustration-vector.jpg"
+        alt="Banner" class="img-fluid w-100 rounded" style="max-height:180px; object-fit:cover;">
+</div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar filter -->
+        <aside class="col-lg-3 mb-4">
+            <div class="bg-white rounded shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-3">MÀU SẮC</h6>
+                <div class="mb-2 d-flex align-items-center gap-2"><span class="d-inline-block rounded-circle"
+                        style="width:18px;height:18px;background:#e53935;"></span> Đỏ</div>
+                <div class="mb-2 d-flex align-items-center gap-2"><span class="d-inline-block rounded-circle"
+                        style="width:18px;height:18px;background:#ff7043;"></span> Cam</div>
+                <div class="mb-2 d-flex align-items-center gap-2"><span class="d-inline-block rounded-circle"
+                        style="width:18px;height:18px;background:#8e24aa;"></span> Tím</div>
+                <div class="mb-2 d-flex align-items-center gap-2"><span class="d-inline-block rounded-circle"
+                        style="width:18px;height:18px;background:#757575;"></span> Xám</div>
+                <div class="mb-2 d-flex align-items-center gap-2"><span class="d-inline-block rounded-circle"
+                        style="width:18px;height:18px;background:#fff;border:1px solid #ccc;"></span> Trắng</div>
+                <div class="text-primary mt-2" style="cursor:pointer;">Xem thêm <i class="bi bi-chevron-down"></i></div>
+            </div>
+            <div class="bg-white rounded shadow-sm p-4">
+                <h6 class="fw-bold mb-3">MỨC GIÁ</h6>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="price1">
+                    <label class="form-check-label" for="price1">Giá dưới 1,000,000₫</label>
+                </div>
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="price2">
+                    <label class="form-check-label" for="price2">1,000,000₫ - 2,000,000₫</label>
+                </div>
+                <!-- Thêm các mức giá khác nếu cần -->
+            </div>
+        </aside>
+        <!-- Main content -->
+        <main class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <h2 class="mb-0" style="font-size:2rem;font-weight:500;">Tất cả sản phẩm</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="fw-semibold">Sắp xếp:</span>
+                    <select class="form-select" style="width:auto;min-width:160px;">
+                        <option>Tên A → Z</option>
+                        <option>Tên Z → A</option>
+                        <option>Giá tăng dần</option>
+                        <option>Giá giảm dần</option>
+                        <option>Hàng mới</option>
+                    </select>
+                </div>
+            </div>
+            <style>
+                .card.product-hover {
+                    transition: transform 0.2s, box-shadow 0.2s;
+                }
+
+                .card.product-hover:hover {
+                    transform: translateY(-8px) scale(1.03);
+                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+                    border-color: #0d6efd;
+                }
+            </style>
+            <div class="row g-4">
+                @foreach (var p in Model)
+                {
+                    var thumbnail = p.Productimages.FirstOrDefault(img => img.IsThumbnail == true)?.ImageUrl ??
+                    p.Productimages.FirstOrDefault()?.ImageUrl ?? "https://via.placeholder.com/320x320?text=No+Image";
+                    var price = p.Productvariants.FirstOrDefault()?.Price ?? 0;
+                    var category = p.Category?.CategoryName ?? "";
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a asp-action="Detail" asp-controller="Product" asp-route-id="@p.ProductId"
+                            class="text-decoration-none text-dark">
+                            <div class="card h-100 border-0 shadow-sm product-hover">
+                                <img src="@thumbnail" class="card-img-top" alt="@p.ProductName"
+                                    style="object-fit:contain; height:320px;">
+                                <div class="card-body px-2 pb-2 pt-3">
+                                    <div class="text-uppercase text-secondary small mb-1">@category</div>
+                                    <div class="fw-semibold mb-1">@p.ProductName</div>
+                                    <div class="fw-bold text-primary mb-1">@string.Format("{0:N0}₫", price)</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            </div>
+        </main>
+    </div>
+</div>

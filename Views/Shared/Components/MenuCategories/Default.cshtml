@@ -1,0 +1,13 @@
+<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <li>
+        <a class="dropdown-item" asp-action="Index" asp-controller="Product">Tất cả sản phẩm</a>
+    </li>
+    @foreach (var cat in Model)
+    {
+        <li>
+            <a class="dropdown-item" asp-action="ByCategory" asp-controller="Product" asp-route-id="@cat.CategoryId">
+                @cat.CategoryName
+            </a>
+        </li>
+    }
+</ul>

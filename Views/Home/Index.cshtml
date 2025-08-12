@@ -1,0 +1,156 @@
+﻿@model HomeViewModel
+
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+<div class="container my-4">
+    <div class="p-5 mb-4 bg-light rounded-3 shadow">
+        <div class="container-fluid py-5">
+            <img src="https://static.vecteezy.com/system/resources/previews/008/174/590/non_2x/fashion-advertising-web-banner-illustration-vector.jpg"
+                alt="Banner" class="img-fluid w-100 rounded object-fit-cover"
+                style="height: 480px; object-fit: cover;" />
+        </div>
+    </div>
+</div>
+<div class="container my-5">
+    <h2 class="text-center mb-5" style="font-size:2.5rem; font-weight:500;">Các sản phẩm</h2>
+    <div class="row justify-content-center g-4">
+        <!-- Danh mục 1 -->
+        @foreach(var cat in Model.Categories){
+        <div class="col-6 col-sm-4 col-md-2 d-flex flex-column align-items-center">
+            <div class="bg-light rounded-circle d-flex align-items-center justify-content-center mb-3"
+                style="width: 170px; height: 170px;">
+                <img src="URL_ẢNH_1" alt="Đồ xuân hè" style="width: 110px; height: 110px; object-fit: contain;">
+            </div>
+            <div class="fw-semibold" style="font-size:1.2rem;">@cat.CategoryName</div>
+            <div class="text-secondary" style="font-size:1rem;">21 sản phẩm</div>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Các sản phẩm -->
+
+<div class="container my-5">
+    <h2 class="text-center mb-4 fw-bold">Bộ sưu tập</h2>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 row-cols-lg-5 g-4">
+        @foreach (var p in Model.Products)
+        {
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm product-card">
+                    <a asp-action="Detail" asp-controller="Product" asp-route-id="@p.ProductId"
+                            class="text-decoration-none text-dark">
+                        <div class="position-relative overflow-hidden">
+                            <img src="@p.Thumbnail" class="card-img-top img-fluid" alt="@p.ProductName"
+                                style="object-fit: contain; height: 320px;">
+                            <div class="overlay d-flex align-items-center justify-content-center">
+                                <a asp-action="Detail" asp-controller="Product" asp-route-id="@p.ProductId"
+                                    class="btn btn-light btn-sm shadow">Xem chi tiết</a>
+                            </div>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="fw-semibold mb-1" style="font-size:1rem;">@p.ProductName</div>
+                            <div class="fw-bold text-primary" style="font-size:1.1rem;">
+                                @p.Price.ToString("N0")₫
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    /* Hiệu ứng hover cho card */
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Overlay mờ khi hover ảnh */
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .overlay {
+        opacity: 1;
+    }
+</style>
+<!-- Section đánh giá khách hàng -->
+<div class="py-5" style="background:#f8f8f8;">
+    <div class="container">
+        <h2 class="text-center mb-5" style="font-size:2.5rem; font-weight:500;">Khách hàng đã nói gì</h2>
+        <div class="row justify-content-center g-4">
+            <!-- Card 1 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-2">Trần Linh</h5>
+                            <div class="mb-2">
+                                <span class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                            </div>
+                            <p class="card-text mb-4">Sản phẩm chất lượng, chất vải mềm mát mặc vào rất thoải mái và dễ
+                                hoạt động, giá cả hợp lý, giao hàng nhanh</p>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Trần Linh" class="rounded"
+                                style="width:80px; height:80px; object-fit:cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-2">Nguyên An</h5>
+                            <div class="mb-2">
+                                <span class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                            </div>
+                            <p class="card-text mb-4">Sản phẩm đẹp, chất liệu tốt, mặc đúng size chuẩn, nhân viên phục
+                                vụ rất tận tình và chu đáo. 10 điểm!</p>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <img src="https://randomuser.me/api/portraits/men/33.jpg" alt="Nguyên An" class="rounded"
+                                style="width:80px; height:80px; object-fit:cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="card-title mb-2">Tuấn Trần</h5>
+                            <div class="mb-2">
+                                <span class="text-warning">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                            </div>
+                            <p class="card-text mb-4">Giao hàng nhanh, anh shipper thân thiện. Sản phẩm đẹp, đã mua
+                                nhiều lần và sẽ tiếp tục ủng hộ shop</p>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <img src="https://randomuser.me/api/portraits/men/34.jpg" alt="Tuấn Trần" class="rounded"
+                                style="width:80px; height:80px; object-fit:cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
