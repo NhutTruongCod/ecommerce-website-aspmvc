@@ -1,0 +1,168 @@
+@model webbanhang.ViewModels.ProfileViewModel
+
+@{
+    Layout = "_Layout";
+}
+
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Thông tin cá nhân -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white d-flex align-items-center">
+                    <i class="fas fa-user-circle me-2 fs-4"></i>
+                    <h4 class="mb-0">Thông tin cá nhân</h4>
+                </div>
+                <div class="card-body p-4">
+
+                    @if (TempData["Message"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle me-2"></i>@TempData["Message"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    }
+
+                    <form asp-action="Profile" method="post">
+                        <div class="row">
+                            <!-- Họ tên -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FullName" class="form-label fw-bold">
+                                    <i class="fas fa-user me-2"></i>Họ và tên
+                                </label>
+                                <input asp-for="FullName" class="form-control" />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">
+                                    <i class="fas fa-envelope me-2"></i>Email
+                                </label>
+                                <input asp-for="Email" class="form-control" readonly />
+                                <span asp-validation-for="Email" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Số điện thoại -->
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Phone" class="form-label fw-bold">
+                                    <i class="fas fa-phone me-2"></i>Số điện thoại
+                                </label>
+                                <input asp-for="Phone" class="form-control" />
+                                <span asp-validation-for="Phone" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Ngày tạo -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar me-2"></i>Ngày tạo tài khoản
+                                </label>
+                                <input value="@Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")" class="form-control"
+                                    readonly />
+                            </div>
+                        </div>
+
+                        <!-- Địa chỉ -->
+                        <div class="mb-3">
+                            <label asp-for="Address" class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                            </label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Đổi mật khẩu -->
+                        <div class="mb-4">
+                            <h5 class="border-bottom pb-2 mb-3 d-flex align-items-center">
+                                <i class="fas fa-key me-2"></i>Thay đổi mật khẩu
+                                <button type="button" class="btn btn-sm btn-outline-primary ms-3"
+                                    id="showChangePassword">Đổi mật khẩu</button>
+                            </h5>
+                            <div id="changePasswordFields" style="display:none;">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="CurrentPassword" class="form-label">Mật khẩu hiện tại</label>
+                                        <input asp-for="CurrentPassword" class="form-control"
+                                            placeholder="Nhập mật khẩu hiện tại" />
+                                        <span asp-validation-for="CurrentPassword" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="NewPassword" class="form-label">Mật khẩu mới</label>
+                                        <input asp-for="NewPassword" class="form-control"
+                                            placeholder="Nhập mật khẩu mới" />
+                                        <span asp-validation-for="NewPassword" class="text-danger small"></span>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label asp-for="ConfirmNewPassword" class="form-label">Xác nhận mật khẩu
+                                            mới</label>
+                                        <input asp-for="ConfirmNewPassword" class="form-control"
+                                            placeholder="Xác nhận mật khẩu mới" />
+                                        <span asp-validation-for="ConfirmNewPassword" class="text-danger small"></span>
+                                    </div>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>Để trống nếu không muốn đổi mật khẩu
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nút -->
+                        <div class="d-flex justify-content-end">
+                            <a href="@Url.Action("Index", "Home")" class="btn btn-secondary me-2">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Cập nhật thông tin
+                            </button>
+                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                var btn = document.getElementById('showChangePassword');
+                                var fields = document.getElementById('changePasswordFields');
+                                if (btn && fields) {
+                                    btn.addEventListener('click', function () {
+                                        fields.style.display = fields.style.display === 'none' ? 'block' : 'none';
+                                    });
+                                }
+                            });
+                        </script>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Thống kê -->
+            <div class="row mt-4 g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                            <h6>Giỏ hàng</h6>
+                            <p class="text-muted mb-0">0 sản phẩm</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <i class="fas fa-heart fa-2x text-danger mb-2"></i>
+                            <h6>Yêu thích</h6>
+                            <p class="text-muted mb-0">0 sản phẩm</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm border-0">
+                        <div class="card-body">
+                            <i class="fas fa-box fa-2x text-success mb-2"></i>
+                            <h6>Đơn hàng</h6>
+                            <p class="text-muted mb-0">0 đơn hàng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

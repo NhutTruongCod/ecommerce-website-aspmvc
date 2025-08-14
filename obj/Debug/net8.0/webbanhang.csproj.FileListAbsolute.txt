@@ -113,3 +113,5 @@ C:\Users\nhutg\webbanhang\obj\Debug\net8.0\webbanhang.csproj.AssemblyReference.c
 C:\Users\nhutg\webbanhang\obj\Debug\net8.0\webbanhang.csproj.Up2Date
 C:\Users\nhutg\webbanhang\bin\Debug\net8.0\MySqlConnector.dll
 C:\Users\nhutg\webbanhang\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+C:\Users\nhutg\webbanhang\obj\Debug\net8.0\webbanhang.sourcelink.json
+C:\Users\nhutg\webbanhang\bin\Debug\net8.0\BCrypt.Net-Next.dll

@@ -34,10 +34,12 @@ public partial class MyDbContext : DbContext
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<Productcategory> Productcategories { get; set; }
-    public object ProductCategories { get; internal set; }
+
     public virtual DbSet<Productimage> Productimages { get; set; }
 
     public virtual DbSet<Productvariant> Productvariants { get; set; }
+
+    public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Shippinginfo> Shippinginfos { get; set; }
 
@@ -46,7 +48,8 @@ public partial class MyDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("name=DefaultConnection", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.42-mysql"));
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseMySql("server=localhost;database=nhutruongweb;user=root;password=Nhut@123", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.42-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -193,6 +196,7 @@ public partial class MyDbContext : DbContext
 
             entity.ToTable("productcategories");
 
+            entity.Property(e => e.CategoryImages).HasMaxLength(255);
             entity.Property(e => e.CategoryName).HasMaxLength(100);
         });
 
@@ -244,6 +248,15 @@ public partial class MyDbContext : DbContext
                 .HasConstraintName("productvariants_ibfk_2");
         });
 
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoleId).HasName("PRIMARY");
+
+            entity.ToTable("roles");
+
+            entity.Property(e => e.RoleName).HasMaxLength(50);
+        });
+
         modelBuilder.Entity<Shippinginfo>(entity =>
         {
             entity.HasKey(e => e.ShippingId).HasName("PRIMARY");
@@ -287,6 +300,8 @@ public partial class MyDbContext : DbContext
 
             entity.HasIndex(e => e.Email, "Email").IsUnique();
 
+            entity.HasIndex(e => e.RoleId, "fk_users_role");
+
             entity.Property(e => e.Address).HasColumnType("text");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
@@ -295,6 +310,12 @@ public partial class MyDbContext : DbContext
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
             entity.Property(e => e.Phone).HasMaxLength(20);
+            entity.Property(e => e.RoleId).HasDefaultValueSql("'2'");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Users)
+                .HasForeignKey(d => d.RoleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_users_role");
         });
 
         OnModelCreatingPartial(modelBuilder);

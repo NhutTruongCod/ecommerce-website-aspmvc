@@ -19,13 +19,21 @@ public class ProductController : Controller
     }
 
     [HttpGet("")]
-    public IActionResult Index()
+    public IActionResult Index(string q)
     {
-        var products = _context.Products
-            .Include(p => p.Category) // Include bảng Category
+        var productsQuery = _context.Products
+            .Include(p => p.Category)
             .Include(p => p.Productimages)
-            .Include(p => p.Productvariants) // Include bảng Productvariants
-            .ToList();
+            .Include(p => p.Productvariants)
+            .AsSplitQuery()
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(q))
+        {
+            productsQuery = productsQuery.Where(p => p.ProductName.Contains(q) || p.Category.CategoryName.Contains(q));
+        }
+
+        var products = productsQuery.ToList();
         return View(products);
     }
 
