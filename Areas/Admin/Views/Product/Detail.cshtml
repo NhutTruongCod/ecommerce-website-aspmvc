@@ -1,0 +1,269 @@
+@model webbanhang.Models.Product
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Chi tiết sản phẩm
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">ID sản phẩm</label>
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="mb-0 text-primary">#@Model.ProductId</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Tên sản phẩm</label>
+                            <div class="p-3 bg-light rounded">
+                                <h5 class="mb-0">@Model.ProductName</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Danh mục</label>
+                            <div class="p-3 bg-light rounded">
+                                @if (Model.Category != null)
+                                {
+                                    <h5 class="mb-0 text-success">
+                                        <i class="fas fa-tag me-2"></i>
+                                        @Model.Category.CategoryName
+                                    </h5>
+                                }
+                                else
+                                {
+                                    <h5 class="mb-0 text-warning">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Chưa phân loại
+                                    </h5>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-muted">Trạng thái</label>
+                            <div class="p-3 bg-light rounded">
+                                <span class="badge bg-success fs-6">
+                                    <i class="fas fa-check-circle me-1"></i>Đang hoạt động
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted">Mô tả sản phẩm</label>
+                        <div class="p-3 bg-light rounded">
+                            <p class="mb-0">@Model.Description</p>
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex gap-3 justify-content-end">
+                    <a asp-action="Index" asp-controller="Product" asp-area="Admin" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.ProductId" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Xóa
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Statistics Card -->
+        <div class="card shadow mb-4">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Thống kê
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="bg-info bg-opacity-10 rounded-circle p-4 d-inline-flex mb-3">
+                        <i class="fas fa-box text-info fa-2x"></i>
+                    </div>
+                    <h5>@Model.ProductName</h5>
+                </div>
+
+                <div class="border-top pt-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Số biến thể:</span>
+                        <span class="badge bg-primary">@Model.Productvariants.Count</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Số hình ảnh:</span>
+                        <span class="badge bg-success">@Model.Productimages.Count</span>
+                    </div>
+
+                    @if (Model.Productvariants.Any())
+                    {
+                        var totalStock = Model.Productvariants.SelectMany(pv => pv.Inventories).Sum(i => i.Quantity);
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Tồn kho:</span>
+                            <span class="badge @(totalStock > 0 ? "bg-info" : "bg-warning")">
+                                @totalStock
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Images -->
+        @if (Model.Productimages.Any())
+        {
+            <div class="card shadow mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-images me-2"></i>Hình ảnh sản phẩm
+                    </h6>
+                </div>
+                <div class="card-body p-2">
+                    <div class="row g-2">
+                        @foreach (var image in Model.Productimages.Take(6))
+                        {
+                            <div class="col-6">
+                                <div class="position-relative">
+                                    <img src="@(image.ImageUrl ?? "/images/no-image.jpg")" alt="@Model.ProductName"
+                                        class="img-fluid rounded" style="aspect-ratio: 1; object-fit: cover;">
+                                    @if (image.IsThumbnail == true)
+                                    {
+                                        <span class="position-absolute top-0 start-0 badge bg-warning m-1">
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.Productimages.Count > 6)
+                        {
+                            <div class="col-12 text-center">
+                                <small class="text-muted">
+                                    +@(Model.Productimages.Count - 6) hình ảnh khác
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Product Variants -->
+        @if (Model.Productvariants.Any())
+        {
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-palette me-2"></i>Biến thể sản phẩm
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach (var variant in Model.Productvariants.Take(5))
+                        {
+                            var stock = variant.Inventories.Sum(i => i.Quantity);
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            @(variant.Color?.ColorName ?? "Không có màu") -
+                                            @(variant.Size?.SizeName ?? "Không có size")
+                                        </h6>
+                                        <small class="text-muted">
+                                            Giá: @(variant.Price.ToString("N0")) VNĐ
+                                        </small>
+                                    </div>
+                                    <span class="badge @(stock > 0 ? "bg-info" : "bg-warning")">
+                                        @stock
+                                    </span>
+                                </div>
+                            </div>
+                        }
+
+                        @if (Model.Productvariants.Count > 5)
+                        {
+                            <div class="list-group-item text-center">
+                                <small class="text-muted">
+                                    +@(Model.Productvariants.Count - 5) biến thể khác
+                                </small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card shadow border-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                    <h6>Chưa có biến thể</h6>
+                    <p class="small text-muted mb-3">Sản phẩm chưa có biến thể nào. Hãy thêm màu sắc, kích thước và giá.</p>
+                    <button class="btn btn-warning btn-sm">
+                        <i class="fas fa-plus me-1"></i>Thêm biến thể
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            border: none;
+            border-radius: 12px;
+        }
+
+        .card-header {
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+        }
+
+        .list-group-item:first-child {
+            border-top: none;
+        }
+
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+
+        .border-warning {
+            border-width: 2px !important;
+        }
+    </style>
+}

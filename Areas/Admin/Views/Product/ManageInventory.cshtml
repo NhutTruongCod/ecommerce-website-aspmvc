@@ -1,0 +1,191 @@
+@model webbanhang.Models.Product
+
+@{
+    ViewData["Title"] = "Quản lý tồn kho - " + Model.ProductName;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-boxes me-2"></i>
+                    Quản lý tồn kho: @Model.ProductName
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sản phẩm đã được tạo thành công! Vui lòng nhập số lượng tồn kho cho từng biến thể.
+                </div>
+
+                @if (Model.Productvariants != null && Model.Productvariants.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Kích thước</th>
+                                    <th>Màu sắc</th>
+                                    <th>Giá (VNĐ)</th>
+                                    <th>Số lượng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var variant in Model.Productvariants)
+                                {
+                                    <tr>
+                                        <td>
+                                            <code>@variant.Sku</code>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">@variant.Size?.SizeName</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">@variant.Color?.ColorName</span>
+                                        </td>
+                                        <td>
+                                            <strong>@variant.Price.ToString("N0") VNĐ</strong>
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control inventory-input"
+                                                data-variant-id="@variant.VariantId"
+                                                value="@(variant.Inventories?.FirstOrDefault()?.Quantity ?? 0)" min="0"
+                                                style="width: 100px;">
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-success btn-sm update-inventory"
+                                                data-variant-id="@variant.VariantId">
+                                                <i class="fas fa-save me-1"></i>Cập nhật
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="button" class="btn btn-warning btn-lg me-3" id="updateAllBtn">
+                            <i class="fas fa-save me-2"></i>Lưu tất cả
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Về danh sách sản phẩm
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Sản phẩm này chưa có biến thể nào. Vui lòng thêm màu sắc và kích thước.
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Cập nhật từng variant
+            $('.update-inventory').click(function () {
+                var variantId = $(this).data('variant-id');
+                var quantity = $(`.inventory-input[data-variant-id="${variantId}"]`).val();
+
+                updateInventory(variantId, quantity, $(this));
+            });
+
+            // Cập nhật tất cả
+            $('#updateAllBtn').click(function () {
+                var updatePromises = [];
+
+                $('.inventory-input').each(function () {
+                    var variantId = $(this).data('variant-id');
+                    var quantity = $(this).val();
+
+                    updatePromises.push(updateInventory(variantId, quantity));
+                });
+
+                Promise.all(updatePromises).then(function () {
+                    showToast('Đã cập nhật tồn kho cho tất cả biến thể!', 'success');
+                });
+            });
+
+            function updateInventory(variantId, quantity, button = null) {
+                if (button) {
+                    button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
+                }
+
+                return $.ajax({
+                    url: '@Url.Action("UpdateInventory")',
+                    type: 'POST',
+                    data: {
+                        variantId: variantId,
+                        quantity: quantity
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            showToast('Cập nhật thành công!', 'success');
+                        }
+                    },
+                    error: function () {
+                        showToast('Có lỗi xảy ra!', 'error');
+                    },
+                    complete: function () {
+                        if (button) {
+                            button.prop('disabled', false).html('<i class="fas fa-save me-1"></i>Cập nhật');
+                        }
+                    }
+                });
+            }
+
+            function showToast(message, type) {
+                var bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+                var toast = $(`
+                        <div class="toast align-items-center text-white ${bgClass} border-0" role="alert">
+                            <div class="d-flex">
+                                <div class="toast-body">${message}</div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                            </div>
+                        </div>
+                    `);
+
+                $('body').append(toast);
+                var toastElement = new bootstrap.Toast(toast[0]);
+                toastElement.show();
+
+                setTimeout(function () {
+                    toast.remove();
+                }, 3000);
+            }
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .table th {
+            font-weight: 600;
+        }
+
+        .inventory-input {
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        code {
+            font-size: 0.9em;
+            padding: 2px 6px;
+            background-color: #f1f3f4;
+            border-radius: 4px;
+        }
+    </style>
+}

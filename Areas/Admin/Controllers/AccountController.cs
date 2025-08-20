@@ -11,7 +11,7 @@ using BCrypt.Net;
 using Microsoft.AspNetCore.Authorization;
 using webbanhang.ViewModels;
 
-namespace YourProject.Areas.Admin.Controllers
+namespace webbanhang.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class AccountController : Controller

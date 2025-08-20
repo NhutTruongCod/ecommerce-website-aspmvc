@@ -2,12 +2,21 @@ using webbanhang.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using webbanhang.Data;
-using webbanhang.Middleware;
+using webbanhang.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Cấu hình để upload nhiều file và file size lớn
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 50 * 1024 * 1024; // 50MB
+});
+
+// Đăng ký ProductService cho IProductService
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddDbContext<MyDbContext>(options =>
     options.UseMySql(
@@ -42,7 +51,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseMiddleware<NoCacheMiddleware>();
 app.UseSession();
 // Chống cache cho toàn bộ site
 app.UseMiddleware<NoCacheMiddleware>();

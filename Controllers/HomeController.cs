@@ -20,16 +20,16 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         var category = _context.Productcategories.ToList();
-        
+
         var product = _context.Products
             .Include(p => p.Productvariants)
             .Include(p => p.Productimages)
             .Select(p => new ProductHomeDto
             {
                 ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                Price = p.Productvariants.FirstOrDefault().Price,
-                Thumbnail = p.Productimages.FirstOrDefault().ImageUrl
+                ProductName = p.ProductName ?? "",
+                Price = p.Productvariants.FirstOrDefault() != null ? p.Productvariants.FirstOrDefault()!.Price : 0,
+                Thumbnail = p.Productimages.FirstOrDefault() != null ? p.Productimages.FirstOrDefault()!.ImageUrl : ""
             }).ToList();
         return View(new HomeViewModel
         {

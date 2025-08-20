@@ -1,0 +1,142 @@
+@model Product
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title">
+                        <i class="fas fa-trash mr-1"></i>
+                        Xác nhận xóa sản phẩm
+                    </h3>
+                    <div class="card-tools">
+                        <a asp-action="Index" class="btn btn-light btn-sm">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Cảnh báo!</strong> Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa
+                        vĩnh viễn.
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <!-- Ảnh sản phẩm -->
+                            @if (Model.Productimages != null && Model.Productimages.Any())
+                            {
+                                <div class="product-images">
+                                    <img src="@Model.Productimages.FirstOrDefault()?.ImageUrl"
+                                        class="img-fluid rounded border"
+                                        style="width: 100%; max-height: 300px; object-fit: cover;"
+                                        alt="@Model.ProductName" />
+
+                                    @if (Model.Productimages.Count() > 1)
+                                    {
+                                        <small class="text-muted d-block mt-2">
+                                            <i class="fas fa-images"></i> +@(Model.Productimages.Count() - 1) ảnh khác
+                                        </small>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="no-image d-flex align-items-center justify-content-center bg-light rounded"
+                                    style="height: 200px;">
+                                    <span class="text-muted">
+                                        <i class="fas fa-image fa-3x"></i><br />
+                                        Không có ảnh
+                                    </span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="col-md-8">
+                            <!-- Thông tin sản phẩm -->
+                            <h4 class="text-danger">@Model.ProductName</h4>
+
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th width="150">Mã sản phẩm:</th>
+                                    <td>#@Model.ProductId</td>
+                                </tr>
+                                <tr>
+                                    <th>Danh mục:</th>
+                                    <td>@(Model.Category?.CategoryName ?? "Không có")</td>
+                                </tr>
+                                <tr>
+                                    <th>Mô tả:</th>
+                                    <td>@(Model.Description ?? "Không có mô tả")</td>
+                                </tr>
+                                <tr>
+                                    <th>Số biến thể:</th>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            @(Model.Productvariants?.Count ?? 0) variants
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Số ảnh:</th>
+                                    <td>
+                                        <span class="badge badge-secondary">
+                                            @(Model.Productimages?.Count ?? 0) ảnh
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Biến thể sẽ bị xóa -->
+                            @if (Model.Productvariants != null && Model.Productvariants.Any())
+                            {
+                                <div class="mt-3">
+                                    <h6 class="text-warning">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Các biến thể sẽ bị xóa:
+                                    </h6>
+                                    <div class="row">
+                                        @foreach (var variant in Model.Productvariants.Take(6))
+                                        {
+                                            <div class="col-md-6 mb-2">
+                                                <span class="badge badge-light border">
+                                                    @variant.Sku
+                                                    (@(variant.Size?.SizeName ?? "N/A") - @(variant.Color?.ColorName ?? "N/A"))
+                                                    - @(variant.Price.ToString("N0")) VNĐ
+                                                </span>
+                                            </div>
+                                        }
+
+                                        @if (Model.Productvariants.Count() > 6)
+                                        {
+                                            <div class="col-12">
+                                                <small class="text-muted">... và @(Model.Productvariants.Count() - 6) biến thể
+                                                    khác</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <form asp-action="DeleteConfirmed" method="post" style="display: inline;">
+                        <input type="hidden" asp-for="ProductId" />
+                        <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác!')">
+                            <i class="fas fa-trash"></i> Xác nhận xóa
+                        </button>
+                    </form>
+
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Hủy bỏ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
