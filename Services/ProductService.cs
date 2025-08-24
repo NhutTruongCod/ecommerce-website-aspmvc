@@ -252,23 +252,63 @@ public class ProductService : IProductService
 
     public async Task DeleteProductAsync(int productId)
     {
-        var product = await _context.Products
-            .Include(p => p.Productimages)
-            .Include(p => p.Productvariants)
-                .ThenInclude(v => v.Inventories)
-            .FirstOrDefaultAsync(p => p.ProductId == productId);
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
-        if (product == null) throw new Exception("Không tìm thấy sản phẩm");
-
-        // Xoá ảnh vật lý
-        foreach (var img in product.Productimages)
+        try
         {
-            var filePath = Path.Combine(_env.WebRootPath, img.ImageUrl.TrimStart('/'));
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-        }
+            var product = await _context.Products
+                .Include(p => p.Productimages)
+                .Include(p => p.Productvariants)
+                    .ThenInclude(v => v.Inventories)
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
 
-        _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
+            if (product == null)
+            {
+                throw new Exception("Không tìm thấy sản phẩm");
+            }
+
+            // Xóa inventory trước
+            foreach (var variant in product.Productvariants)
+            {
+                if (variant.Inventories != null && variant.Inventories.Any())
+                {
+                    _context.Inventories.RemoveRange(variant.Inventories);
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            // Xóa variants
+            if (product.Productvariants != null && product.Productvariants.Any())
+            {
+                _context.Productvariants.RemoveRange(product.Productvariants);
+                await _context.SaveChangesAsync();
+            }
+
+            // Xóa ảnh vật lý và entity
+            if (product.Productimages != null && product.Productimages.Any())
+            {
+                foreach (var img in product.Productimages)
+                {
+                    var filePath = Path.Combine(_env.WebRootPath, "uploads", img.ImageUrl.TrimStart('/').Split('/').Last());
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+                }
+                _context.Productimages.RemoveRange(product.Productimages);
+                await _context.SaveChangesAsync();
+            }
+
+            // Cuối cùng xóa product
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception)
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 }

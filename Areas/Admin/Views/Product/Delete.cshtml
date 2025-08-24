@@ -124,8 +124,9 @@
                 </div>
 
                 <div class="card-footer">
-                    <form asp-action="DeleteConfirmed" method="post" style="display: inline;">
-                        <input type="hidden" asp-for="ProductId" />
+                    <form asp-action="DeleteConfirmed" asp-route-id="@Model.ProductId" method="post"
+                        style="display: inline;">
+                        <input type="hidden" name="id" value="@Model.ProductId" />
                         <button type="submit" class="btn btn-danger"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác!')">
                             <i class="fas fa-trash"></i> Xác nhận xóa

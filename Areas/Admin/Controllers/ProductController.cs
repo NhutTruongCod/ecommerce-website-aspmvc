@@ -243,7 +243,29 @@ namespace webbanhang.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _productService.DeleteProductAsync(id);
+            try
+            {
+                Console.WriteLine($"Attempting to delete product with ID: {id}");
+
+                // Kiểm tra xem product có tồn tại không
+                var product = await _context.Products.FindAsync(id);
+                if (product == null)
+                {
+                    TempData["Error"] = "Không tìm thấy sản phẩm để xóa!";
+                    return RedirectToAction("Index");
+                }
+
+                await _productService.DeleteProductAsync(id);
+                Console.WriteLine($"Successfully deleted product with ID: {id}");
+                TempData["Success"] = "Sản phẩm đã được xóa thành công!";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting product with ID {id}: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                TempData["Error"] = $"Lỗi khi xóa sản phẩm: {ex.Message}";
+            }
+
             return RedirectToAction("Index");
         }
     }
